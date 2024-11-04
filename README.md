@@ -24,6 +24,7 @@ const info = {
     technologies: {
         backEnd: {
             js: ["Node", "Fastify", "Express"],
+            py: ["Kivy", "Sockets", "tensorflow", "selenium"],
         },
         mobileApp: {
             native: ["Android Development"]
