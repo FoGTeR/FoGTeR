@@ -27,4 +27,4 @@ class FoGTeR:
     motto   = "there are two ways to write error-free programs; only the third one works"
 ```
 
-<sub>Cards are rebuilt every hour by <a href=".github/workflows/profile.yml">a workflow</a> from the GitHub API — private repositories included.</sub>
+<sub>Cards are rebuilt daily by <a href=".github/workflows/profile.yml">a workflow</a> from the GitHub API — private repositories included.</sub>
