@@ -13,10 +13,6 @@ TOKEN = os.environ.get("PROFILE_TOKEN") or os.environ.get("GITHUB_TOKEN")
 LOGIN = os.environ.get("PROFILE_LOGIN", "FoGTeR")
 TZ = ZoneInfo(os.environ.get("PROFILE_TZ", "Europe/Kyiv"))
 SKIP_OWNERS = {o.strip() for o in os.environ.get("SKIP_OWNERS", "EpicGames").split(",") if o.strip()}
-# private repos whose names may appear on the card; the rest are shown as "private"
-SHOW_PRIVATE = {r.strip() for r in os.environ.get(
-    "SHOW_PRIVATE", "FoGTeR/friday_api,FoGTeR/AIDaniel,friyaai/website,friyaai/website_backend,friyaai/main_website"
-).split(",") if r.strip()}
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets")
 
 FONT = "'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
@@ -47,7 +43,7 @@ query($after: String) {
                  affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER]) {
       pageInfo { hasNextPage endCursor }
       nodes {
-        nameWithOwner isPrivate pushedAt owner { login }
+        nameWithOwner pushedAt owner { login }
         defaultBranchRef { name }
         languages(first: 12, orderBy: {field: SIZE, direction: DESC}) {
           totalSize edges { size node { name } }
@@ -108,7 +104,7 @@ def collect():
              if r["owner"]["login"] not in SKIP_OWNERS and r["defaultBranchRef"]
              and r["pushedAt"] and r["pushedAt"] >= since.isoformat()[:19]]
 
-    seen, commits, per_repo, langs = set(), [], Counter(), defaultdict(float)
+    seen, commits, langs = set(), [], defaultdict(float)
     for r in repos:
         owner, name = r["nameWithOwner"].split("/")
         n = 0
@@ -121,7 +117,6 @@ def collect():
             n += 1
         if not n:
             continue
-        per_repo[r["nameWithOwner"]] = n
         total = r["languages"]["totalSize"] or 1
         for e in r["languages"]["edges"]:
             langs[e["node"]["name"]] += n * e["size"] / total
@@ -135,11 +130,10 @@ def collect():
     for d in commits + prs + issues + reviews:
         daily[d.astimezone(TZ).date()] += 1
 
-    private = {r["nameWithOwner"] for r in repos if r["isPrivate"]}
     return {
         "now": now, "since": since, "daily": daily,
         "commits": commits, "prs": len(prs), "issues": len(issues), "reviews": len(reviews),
-        "per_repo": per_repo, "private": private, "langs": langs,
+        "langs": langs,
         "member_since": viewer["createdAt"][:4],
     }
 
@@ -220,65 +214,49 @@ def header(data):
             dots.append(f'<rect x="{x - 6}" y="{y - 6:.1f}" width="12" height="12" fill="{BG}" stroke="{c}" stroke-width="1.5"/>'
                         f'<rect x="{x - 2.5}" y="{y - 2.5:.1f}" width="5" height="5" fill="{c}" class="pulse" '
                         f'style="animation-delay:{(i * 0.4 + j * 0.23) % 2.6:.2f}s"/>')
-    total = sum(data["daily"].values())
     body = f"""
 <g>{''.join(edges)}</g><g>{''.join(dots)}</g>
 <g class="in">
-  <text x="40" y="56" class="k">BACKEND / AI INFRASTRUCTURE</text>
+  <text x="40" y="56" class="k">FULL-STACK / AI INFRASTRUCTURE</text>
   <text x="37" y="118" font-size="64" font-weight="800" letter-spacing="-2">FOGTER</text>
   <rect x="40" y="134" width="64" height="4" fill="{PINK}"/>
   <text x="40" y="166" font-size="13">Building Friya — AI assistant with real tools.</text>
-  <text x="40" y="200" font-size="11" class="muted">{total:,} CONTRIBUTIONS / 365 DAYS — ON GITHUB SINCE {data['member_since']}</text>
+  <text x="40" y="200" font-size="11" class="muted">ON GITHUB SINCE {data['member_since']}</text>
 </g>"""
     return svg(w, h, body)
 
 
 def stats(data):
-    w, h = 900, 300
-    total = sum(data["daily"].values())
+    w, h = 900, 240
     cur, best = streaks(data["daily"], data["now"].astimezone(TZ).date())
     active = sum(1 for v in data["daily"].values() if v)
     kinds = [("COMMITS", len(data["commits"]), CYAN), ("PULL REQUESTS", data["prs"], VIOLET),
              ("CODE REVIEW", data["reviews"], PINK), ("ISSUES", data["issues"], LIME)]
     denom = sum(v for _, v, _ in kinds) or 1
 
-    tiles = [("CONTRIBUTIONS", f"{total:,}"), ("CURRENT STREAK", f"{cur}d"),
-             ("LONGEST STREAK", f"{best}d"), ("ACTIVE DAYS", f"{active}")]
+    tiles = [("CURRENT STREAK", f"{cur}d"), ("LONGEST STREAK", f"{best}d"), ("ACTIVE DAYS / YEAR", f"{active / 365 * 100:.0f}%")]
     parts = []
     for i, (k, v) in enumerate(tiles):
-        x = 28 + i * 214
+        x = 28 + i * 286
         parts.append(f'<g class="in" style="animation-delay:{i * .12:.2f}s">'
-                     f'<rect x="{x}" y="24" width="200" height="78" fill="{PANEL}" stroke="{GRID}" stroke-width="1.5"/>'
-                     f'<rect x="{x}" y="24" width="200" height="3" fill="{PINK if i == 0 else TEXT}"/>'
+                     f'<rect x="{x}" y="24" width="272" height="78" fill="{PANEL}" stroke="{GRID}" stroke-width="1.5"/>'
+                     f'<rect x="{x}" y="24" width="272" height="3" fill="{PINK if i == 0 else TEXT}"/>'
                      f'<text x="{x + 16}" y="48" class="k">{k}</text>'
                      f'<text x="{x + 16}" y="86" font-size="30" font-weight="800">{v}</text></g>')
 
-    parts.append(f'<text x="28" y="138" class="k">ACTIVITY BREAKDOWN</text>')
+    parts.append(f'<text x="28" y="136" class="k">ACTIVITY BREAKDOWN</text>')
     for i, (k, v, c) in enumerate(kinds):
-        y = 156 + i * 30
+        y = 152 + (i // 2) * 34
+        x = 28 + (i % 2) * 436
         pct = v / denom
-        bw = max(4, 300 * pct)
-        parts.append(f'<text x="28" y="{y + 11}" font-size="11" class="muted">{k}</text>'
-                     f'<rect x="150" y="{y}" width="300" height="12" fill="{PANEL}" stroke="{GRID}"/>'
-                     f'<rect x="150" y="{y}" width="{bw:.1f}" height="12" fill="{c}" class="bar" '
+        bw = max(4, 260 * pct)
+        parts.append(f'<text x="{x}" y="{y + 11}" font-size="11" class="muted">{k}</text>'
+                     f'<rect x="{x + 112}" y="{y}" width="260" height="12" fill="{PANEL}" stroke="{GRID}"/>'
+                     f'<rect x="{x + 112}" y="{y}" width="{bw:.1f}" height="12" fill="{c}" class="bar" '
                      f'style="animation-delay:{.3 + i * .15:.2f}s"/>'
-                     f'<rect x="{148 + bw:.1f}" y="{y - 3}" width="4" height="18" fill="{TEXT}" class="in" '
+                     f'<rect x="{x + 110 + bw:.1f}" y="{y - 3}" width="4" height="18" fill="{TEXT}" class="in" '
                      f'style="animation-delay:{1.4 + i * .15:.2f}s"/>'
-                     f'<text x="465" y="{y + 11}" font-size="11">{pct * 100:.0f}% <tspan class="muted">· {v:,}</tspan></text>')
-
-    parts.append(f'<text x="560" y="138" class="k">TOP REPOSITORIES</text>')
-    top = data["per_repo"].most_common(5)
-    rmax = top[0][1] if top else 1
-    for i, (name, n) in enumerate(top):
-        y = 156 + i * 24
-        shown = name if name not in data["private"] or name in SHOW_PRIVATE else f"{name.split('/')[0]}/<private>"
-        parts.append(f'<text x="560" y="{y + 10}" font-size="11">{escape(shown)}</text>'
-                     f'<rect x="560" y="{y + 14}" width="{300 * n / rmax:.1f}" height="3" fill="{PINK if i == 0 else VIOLET}" class="bar" '
-                     f'style="animation-delay:{.4 + i * .1:.2f}s"/>'
-                     f'<text x="870" y="{y + 10}" font-size="10" text-anchor="end" class="muted">{n:,}</text>')
-    rest = len(data["per_repo"]) - len(top)
-    if rest > 0:
-        parts.append(f'<text x="560" y="{156 + 5 * 24 + 6}" font-size="10" class="muted">+ {rest} more repositories</text>')
+                     f'<text x="{x + 410}" y="{y + 11}" font-size="11" text-anchor="end">{pct * 100:.0f}%</text>')
     parts.append(stamp(data, w, h))
     return svg(w, h, "\n".join(parts))
 
@@ -294,7 +272,7 @@ def calendar(data):
     vals = sorted(v for v in data["daily"].values() if v)
     q = [vals[int(len(vals) * f)] for f in (.25, .5, .75)] if vals else [1, 2, 3]
     levels = ["#1c1c1c", "#3d3d3d", "#737373", "#bdbdbd", TEXT]
-    parts = [f'<text x="20" y="28" class="k">CONTRIBUTIONS / 365 DAYS</text>']
+    parts = [f'<text x="20" y="28" class="k">ACTIVITY / 365 DAYS</text>']
     for r, lbl in ((1, "Mon"), (3, "Wed"), (5, "Fri")):
         parts.append(f'<text x="{ox - 34}" y="{oy + r * cell + 4}" font-size="9" class="muted">{lbl}</text>')
     month = None
@@ -315,14 +293,12 @@ def calendar(data):
             cls = "in"
             dly = f"{delay:.2f}"
             parts.append(f'<rect x="{x - 6}" y="{y - 6}" width="12" height="12" fill="{PINK if d == today and v else c}" class="{cls}" '
-                         f'style="animation-delay:{dly}s"><title>{d.isoformat()}: {v}</title></rect>')
+                         f'style="animation-delay:{dly}s"/>')
     lx = w - 190
     parts.append(f'<text x="{lx}" y="{h - 14}" font-size="9" class="muted">less</text>')
     for i, c in enumerate(levels):
         parts.append(f'<rect x="{lx + 31 + i * 14}" y="{h - 22}" width="10" height="10" fill="{c}"/>')
     parts.append(f'<text x="{lx + 36 + 5 * 14}" y="{h - 14}" font-size="9" class="muted">more</text>')
-    parts.append(f'<text x="20" y="{h - 14}" font-size="9" class="muted">{sum(data["daily"].values()):,} contributions · '
-                 f'{len(data["per_repo"])} repositories</text>')
     return svg(w, h, "\n".join(parts))
 
 
@@ -395,8 +371,7 @@ def main():
                      ("languages", languages), ("rhythm", rhythm)):
         with open(os.path.join(OUT, f"{name}.svg"), "w", encoding="utf-8") as f:
             f.write(fn(data))
-    print(f"{sum(data['daily'].values())} contributions, {len(data['commits'])} commits, "
-          f"{len(data['per_repo'])} repos")
+    print("cards rendered")
 
 
 if __name__ == "__main__":

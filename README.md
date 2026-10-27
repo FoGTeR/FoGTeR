@@ -18,7 +18,7 @@
 
 ```python
 class FoGTeR:
-    role    = "backend & AI infrastructure"
+    role    = "full-stack & AI infrastructure"
     focus   = "Friya — AI assistant with real tools, sandboxes and memory"
     stack   = ["Python", "Quart", "asyncio", "TypeScript", "Svelte", "MongoDB", "Redis"]
     infra   = ["Kubernetes", "gVisor", "Docker", "Cloudflare", "GitHub Actions", "RunPod"]
