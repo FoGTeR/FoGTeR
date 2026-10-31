@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="300" viewBox="0 0 440 300" font-family="'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">
+<defs>
+  <linearGradient id="beam"><stop offset="0" stop-color="#f2f2f2"/></linearGradient>
+  <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#2a2a2a" stroke-width=".5" opacity=".35"/></pattern>
+  
+</defs>
+<style>
+  text { fill: #f2f2f2; }
+  .muted { fill: #8c8c8c; }
+  .k { font-size: 11px; font-weight: 700; letter-spacing: .2em; fill: #8c8c8c; }
+  @keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
+  @keyframes flow { to { stroke-dashoffset: -120; } }
+  .bar { transform-box: fill-box; transform-origin: left; animation: fill 1.4s cubic-bezier(.2,.8,.2,1) both; }
+  .col { transform-box: fill-box; transform-origin: bottom; animation: grow 1.2s cubic-bezier(.2,.8,.2,1) both; }
+  .in { animation: fade .8s ease both; }
+  .pulse { animation: pulse 2.6s ease-in-out infinite; }
+  .flow { stroke-dasharray: 3 117; animation: flow 2.4s linear infinite; }
+</style>
+<rect width="440" height="300" fill="#0a0a0a"/>
+<rect width="440" height="300" fill="url(#grid)"/>
+<rect x="1" y="1" width="438" height="298" fill="none" stroke="#f2f2f2" stroke-width="2"/>
+<rect x="0" y="0" width="10" height="300" fill="#f2f2f2"/>
+<text x="24" y="34" class="k">LANGUAGES</text>
+<rect x="24.0" y="50" width="268.9" height="10" fill="#f2f2f2" class="bar" style="animation-delay:0.00s"/>
+<rect x="292.9" y="50" width="45.3" height="10" fill="#c4c4c4" class="bar" style="animation-delay:0.12s"/>
+<rect x="338.2" y="50" width="25.9" height="10" fill="#9a9a9a" class="bar" style="animation-delay:0.24s"/>
+<rect x="364.1" y="50" width="17.3" height="10" fill="#767676" class="bar" style="animation-delay:0.36s"/>
+<rect x="381.4" y="50" width="16.2" height="10" fill="#5a5a5a" class="bar" style="animation-delay:0.48s"/>
+<rect x="397.6" y="50" width="12.3" height="10" fill="#444444" class="bar" style="animation-delay:0.60s"/>
+<rect x="410.0" y="50" width="2.6" height="10" fill="#333333" class="bar" style="animation-delay:0.72s"/>
+<rect x="24" y="50" width="392" height="10" fill="none" stroke="#2a2a2a"/>
+<g class="in" style="animation-delay:0.30s"><rect x="27" y="79" width="10" height="10" fill="#f2f2f2"/><text x="46" y="88" font-size="12">Python</text><text x="416" y="88" font-size="12" text-anchor="end">68.6%</text><rect x="160" y="81" width="190" height="5" fill="#121212"/><rect x="160" y="81" width="190.0" height="5" fill="#f2f2f2" class="bar" style="animation-delay:0.50s"/></g>
+<g class="in" style="animation-delay:0.40s"><rect x="27" y="105" width="10" height="10" fill="#c4c4c4"/><text x="46" y="114" font-size="12">TypeScript</text><text x="416" y="114" font-size="12" text-anchor="end">11.6%</text><rect x="160" y="107" width="190" height="5" fill="#121212"/><rect x="160" y="107" width="32.0" height="5" fill="#c4c4c4" class="bar" style="animation-delay:0.60s"/></g>
+<g class="in" style="animation-delay:0.50s"><rect x="27" y="131" width="10" height="10" fill="#9a9a9a"/><text x="46" y="140" font-size="12">GDScript</text><text x="416" y="140" font-size="12" text-anchor="end">6.6%</text><rect x="160" y="133" width="190" height="5" fill="#121212"/><rect x="160" y="133" width="18.3" height="5" fill="#9a9a9a" class="bar" style="animation-delay:0.70s"/></g>
+<g class="in" style="animation-delay:0.60s"><rect x="27" y="157" width="10" height="10" fill="#767676"/><text x="46" y="166" font-size="12">Svelte</text><text x="416" y="166" font-size="12" text-anchor="end">4.4%</text><rect x="160" y="159" width="190" height="5" fill="#121212"/><rect x="160" y="159" width="12.2" height="5" fill="#767676" class="bar" style="animation-delay:0.80s"/></g>
+<g class="in" style="animation-delay:0.70s"><rect x="27" y="183" width="10" height="10" fill="#5a5a5a"/><text x="46" y="192" font-size="12">JavaScript</text><text x="416" y="192" font-size="12" text-anchor="end">4.1%</text><rect x="160" y="185" width="190" height="5" fill="#121212"/><rect x="160" y="185" width="11.5" height="5" fill="#5a5a5a" class="bar" style="animation-delay:0.90s"/></g>
+<g class="in" style="animation-delay:0.80s"><rect x="27" y="209" width="10" height="10" fill="#444444"/><text x="46" y="218" font-size="12">HTML</text><text x="416" y="218" font-size="12" text-anchor="end">3.1%</text><rect x="160" y="211" width="190" height="5" fill="#121212"/><rect x="160" y="211" width="8.7" height="5" fill="#444444" class="bar" style="animation-delay:1.00s"/></g>
+<g class="in" style="animation-delay:0.90s"><rect x="27" y="235" width="10" height="10" fill="#333333"/><text x="46" y="244" font-size="12">Shell</text><text x="416" y="244" font-size="12" text-anchor="end">0.7%</text><rect x="160" y="237" width="190" height="5" fill="#121212"/><rect x="160" y="237" width="2.0" height="5" fill="#333333" class="bar" style="animation-delay:1.10s"/></g>
+<text x="422" y="288" text-anchor="end" font-size="9" class="muted" opacity=".7">sync 31.10.2026 11:33 · Kyiv</text>
+</svg>
